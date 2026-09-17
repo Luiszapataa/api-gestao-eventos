@@ -1,7 +1,6 @@
 package com.luiszapata.gestaoeventosapi.model;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -10,27 +9,25 @@ import java.time.LocalDateTime;
 @Table(name = "inscricoes")
 public class Inscricao {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "É obrigatório digitar o nome do participante! ")
-    private String nomeParticipante;
 
-    @NotBlank(message = "É obrigatório inserir um email ")
-    @Email(message = "Email inválido! ")
-    private String emailParticipante;
+    private LocalDateTime dataInscricao;
 
-    private LocalDateTime dataInscricao; //validado no service
 
     @NotNull(message = "O evento é obrigatório")
     @ManyToOne
     @JoinColumn(name = "evento_id", nullable = false)
-
     private Evento evento;
 
-    public Inscricao() {
-    }
+
+    @NotNull(message = "O participante é obrigatório")
+    @ManyToOne
+    @JoinColumn(name = "participante_id", nullable = false)
+    private Participante participante;
 
     public Long getId() {
         return id;
@@ -40,20 +37,12 @@ public class Inscricao {
         this.id = id;
     }
 
-    public String getNomeParticipante() {
-        return nomeParticipante;
+    public Evento getEvento() {
+        return evento;
     }
 
-    public void setNomeParticipante(String nomeParticipante) {
-        this.nomeParticipante = nomeParticipante;
-    }
-
-    public String getEmailParticipante() {
-        return emailParticipante;
-    }
-
-    public void setEmailParticipante(String emailParticipante) {
-        this.emailParticipante = emailParticipante;
+    public void setEvento(Evento evento) {
+        this.evento = evento;
     }
 
     public LocalDateTime getDataInscricao() {
@@ -64,11 +53,16 @@ public class Inscricao {
         this.dataInscricao = dataInscricao;
     }
 
-    public Evento getEvento() {
-        return evento;
+    public Participante getParticipante() {
+        return participante;
     }
 
-    public void setEvento(Evento evento) {
-        this.evento = evento;
+    public void setParticipante(Participante participante) {
+        this.participante = participante;
     }
+
+    public Inscricao() {
+
+    }
+
 }
