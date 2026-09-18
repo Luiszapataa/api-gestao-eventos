@@ -5,9 +5,13 @@ import com.luiszapata.gestaoeventosapi.dto.EventoResponseDTO;
 import com.luiszapata.gestaoeventosapi.service.EventoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+
 
 @RestController
 @RequestMapping("/eventos")
@@ -17,8 +21,9 @@ public class EventoController{
     private EventoService eventoService;
 
     @PostMapping
-    public EventoResponseDTO criar(@RequestBody @Valid EventoRequestDTO dto){
-        return eventoService.salvar(dto);
+    public ResponseEntity<EventoResponseDTO> criar(@RequestBody @Valid EventoRequestDTO dto){
+        EventoResponseDTO criado = eventoService.salvar(dto);
+        return new ResponseEntity<>(criado, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -38,8 +43,11 @@ public class EventoController{
     }
 
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id){
+    public ResponseEntity<Void> deletar(@PathVariable Long id){
         eventoService.deletar(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+
 
 }
