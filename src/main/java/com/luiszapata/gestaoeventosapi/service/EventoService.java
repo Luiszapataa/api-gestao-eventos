@@ -81,5 +81,19 @@ public class EventoService{
 
     }
 
+    public EventoResponseDTO atualizar(Long id, EventoRequestDTO dto){
+        Evento evento = buscarEntidadePorId(id);
+
+        evento.setNome(dto.getNome());
+        evento.setDescricao(dto.getDescricao());
+        evento.setDataEvento(dto.getDataEvento());
+        evento.setLocal(dto.getLocal());
+        evento.setVagasTotais(dto.getVagasTotais());
+
+        Evento atualizado = eventoRepository.save(evento);
+
+        return converterParaResponseDTO(atualizado);
+    }
+
 
 }

@@ -38,8 +38,7 @@ public class EventoController{
 
     @PutMapping("/{id}")
     public EventoResponseDTO atualizar(@PathVariable Long id, @RequestBody @Valid EventoRequestDTO dto){
-        eventoService.deletar(id);
-        return eventoService.salvar(dto);
+        return eventoService.atualizar(id, dto);
     }
 
     @DeleteMapping("/{id}")
