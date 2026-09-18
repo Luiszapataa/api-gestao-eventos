@@ -37,6 +37,7 @@ public class InscricaoService{
 
         if (vagasOcupadas >= evento.getVagasTotais()){
             throw new RuntimeException("Não há vagas disponíveis para este evento");
+
         }
 
         Inscricao inscricao = new Inscricao();
