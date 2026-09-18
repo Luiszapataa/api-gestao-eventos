@@ -1,90 +1,128 @@
 package com.luiszapata.gestaoeventosapi.service;
 
+import com.luiszapata.gestaoeventosapi.dto.EventoResponseDTO;
+import com.luiszapata.gestaoeventosapi.dto.InscricaoRequestDTO;
+import com.luiszapata.gestaoeventosapi.dto.InscricaoResponseDTO;
+import com.luiszapata.gestaoeventosapi.dto.ParticipanteResponseDTO;
 import com.luiszapata.gestaoeventosapi.model.Evento;
 import com.luiszapata.gestaoeventosapi.model.Inscricao;
 import com.luiszapata.gestaoeventosapi.model.Participante;
-import com.luiszapata.gestaoeventosapi.repository.EventoRepository;
 import com.luiszapata.gestaoeventosapi.repository.InscricaoRepository;
-import com.luiszapata.gestaoeventosapi.repository.ParticipanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class InscricaoService {
+public class InscricaoService{
 
     @Autowired
     private InscricaoRepository inscricaoRepository;
 
     @Autowired
-    private EventoRepository eventoRepository;
+    private EventoService eventoService;
 
     @Autowired
-    private ParticipanteRepository participanteRepository;
+    private ParticipanteService participanteService;
 
-    public Inscricao inscrever(Inscricao inscricao) {
-        Long eventoId = inscricao.getEvento().getId();
-        Long participanteId = inscricao.getParticipante().getId();
+    public InscricaoResponseDTO inscrever(InscricaoRequestDTO dto){
+        Evento evento = eventoService.buscarEntidadePorId(dto.getEventoId());
+        Participante participante = participanteService.buscarEntidadePorId(dto.getParticipanteId());
 
-        Optional<Evento> eventoOptional = eventoRepository.findById(eventoId);
-        Evento evento;
-
-        if (eventoOptional.isPresent()) {
-            evento = eventoOptional.get();
-        } else {
-            throw new RuntimeException("Evento não encontrado com id: " + eventoId);
-        }
-
-        Optional<Participante> participanteOptional = participanteRepository.findById(participanteId);
-        Participante participante;
-
-        if (participanteOptional.isPresent()) {
-            participante = participanteOptional.get();
-        } else {
-            throw new RuntimeException("Participante não encontrado com id: " + participanteId);
-        }
-
-        List<Inscricao> inscricoesDoEvento = inscricaoRepository.findByEventoId(eventoId);
+        List<Inscricao> inscricoesDoEvento = inscricaoRepository.findByEventoId(evento.getId());
         int vagasOcupadas = inscricoesDoEvento.size();
 
-        if (vagasOcupadas >= evento.getVagasTotais()) {
+        if (vagasOcupadas >= evento.getVagasTotais()){
             throw new RuntimeException("Não há vagas disponíveis para este evento");
         }
 
+        Inscricao inscricao = new Inscricao();
         inscricao.setEvento(evento);
         inscricao.setParticipante(participante);
         inscricao.setDataInscricao(LocalDateTime.now());
 
-        return inscricaoRepository.save(inscricao);
+        Inscricao salva = inscricaoRepository.save(inscricao);
+
+        return converterParaResponseDTO(salva);
     }
 
-    public List<Inscricao> listarTodas() {
-        return inscricaoRepository.findAll();
+    public List<InscricaoResponseDTO> listarTodas(){
+        List<Inscricao> inscricoes = inscricaoRepository.findAll();
+        List<InscricaoResponseDTO> resultado = new ArrayList<>();
+
+        for (Inscricao inscricao : inscricoes){
+            resultado.add(converterParaResponseDTO(inscricao));
+        }
+
+        return resultado;
     }
 
-    public List<Inscricao> listarPorEvento(Long eventoId) {
-        return inscricaoRepository.findByEventoId(eventoId);
+    public List<InscricaoResponseDTO> listarPorEvento(Long eventoId){
+        List<Inscricao> inscricoes = inscricaoRepository.findByEventoId(eventoId);
+        List<InscricaoResponseDTO> resultado = new ArrayList<>();
+
+        for (Inscricao inscricao : inscricoes){
+            resultado.add(converterParaResponseDTO(inscricao));
+        }
+
+        return resultado;
     }
 
-    public List<Inscricao> listarPorParticipante(Long participanteId) {
-        return inscricaoRepository.findByParticipanteId(participanteId);
+    public List<InscricaoResponseDTO> listarPorParticipante(Long participanteId){
+        List<Inscricao> inscricoes = inscricaoRepository.findByParticipanteId(participanteId);
+        List<InscricaoResponseDTO> resultado = new ArrayList<>();
+
+        for (Inscricao inscricao : inscricoes){
+            resultado.add(converterParaResponseDTO(inscricao));
+        }
+
+        return resultado;
     }
 
-    public Inscricao buscarPorId(Long id) {
+    public InscricaoResponseDTO buscarPorId(Long id){
+        Inscricao inscricao = buscarEntidadePorId(id);
+        return converterParaResponseDTO(inscricao);
+    }
+
+    public void deletar(Long id){
+        inscricaoRepository.deleteById(id);
+    }
+
+    private Inscricao buscarEntidadePorId(Long id){
         Optional<Inscricao> inscricaoOptional = inscricaoRepository.findById(id);
 
-        if (inscricaoOptional.isPresent()) {
+        if (inscricaoOptional.isPresent()){
             return inscricaoOptional.get();
         } else {
             throw new RuntimeException("Inscrição não encontrada com id: " + id);
         }
     }
 
-    public void deletar(Long id) {
-        inscricaoRepository.deleteById(id);
+    private InscricaoResponseDTO converterParaResponseDTO(Inscricao inscricao){
+        EventoResponseDTO eventoDTO = new EventoResponseDTO(
+                inscricao.getEvento().getId(),
+                inscricao.getEvento().getNome(),
+                inscricao.getEvento().getDescricao(),
+                inscricao.getEvento().getDataEvento(),
+                inscricao.getEvento().getLocal(),
+                inscricao.getEvento().getVagasTotais()
+        );
+
+        ParticipanteResponseDTO participanteDTO = new ParticipanteResponseDTO(
+                inscricao.getParticipante().getId(),
+                inscricao.getParticipante().getNome(),
+                inscricao.getParticipante().getEmail()
+        );
+
+        return new InscricaoResponseDTO(
+                inscricao.getId(),
+                inscricao.getDataInscricao(),
+                eventoDTO,
+                participanteDTO
+        );
     }
 
 }

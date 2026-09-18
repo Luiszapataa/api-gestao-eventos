@@ -1,7 +1,7 @@
 package com.luiszapata.gestaoeventosapi.controller;
 
-
-import com.luiszapata.gestaoeventosapi.model.Evento;
+import com.luiszapata.gestaoeventosapi.dto.EventoRequestDTO;
+import com.luiszapata.gestaoeventosapi.dto.EventoResponseDTO;
 import com.luiszapata.gestaoeventosapi.service.EventoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,38 +11,35 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/eventos")
-public class EventoController {
+public class EventoController{
 
     @Autowired
     private EventoService eventoService;
 
     @PostMapping
-    public Evento criar(@RequestBody @Valid Evento evento){
-        return eventoService.salvar(evento);
+    public EventoResponseDTO criar(@RequestBody @Valid EventoRequestDTO dto){
+        return eventoService.salvar(dto);
     }
 
     @GetMapping
-    public List<Evento> listar(){
+    public List<EventoResponseDTO> listar(){
         return eventoService.listarTodos();
     }
 
     @GetMapping("/{id}")
-    public Evento buscarPorId(@PathVariable Long id) {
+    public EventoResponseDTO buscarPorId(@PathVariable Long id){
         return eventoService.buscarPorId(id);
     }
 
-
     @PutMapping("/{id}")
-    public Evento atualizar(@PathVariable Long id, @RequestBody @Valid Evento evento) {
-        evento.setId(id);
-        return eventoService.salvar(evento);
+    public EventoResponseDTO atualizar(@PathVariable Long id, @RequestBody @Valid EventoRequestDTO dto){
+        eventoService.deletar(id);
+        return eventoService.salvar(dto);
     }
-
 
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id) {
+    public void deletar(@PathVariable Long id){
         eventoService.deletar(id);
     }
-
 
 }
