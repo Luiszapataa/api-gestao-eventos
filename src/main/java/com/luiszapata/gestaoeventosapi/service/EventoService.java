@@ -2,10 +2,12 @@ package com.luiszapata.gestaoeventosapi.service;
 
 import com.luiszapata.gestaoeventosapi.dto.EventoRequestDTO;
 import com.luiszapata.gestaoeventosapi.dto.EventoResponseDTO;
+import com.luiszapata.gestaoeventosapi.exception.RecursoNaoEncontradoException;
 import com.luiszapata.gestaoeventosapi.model.Evento;
 import com.luiszapata.gestaoeventosapi.repository.EventoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +63,7 @@ public class EventoService{
         if (eventoOptional.isPresent()){
             return eventoOptional.get();
         } else{
-            throw new RuntimeException("Evento não encontrado com id: " + id);
+            throw new RecursoNaoEncontradoException("Evento não encontrado com id: " + id);
         }
     }
 

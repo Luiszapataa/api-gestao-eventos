@@ -2,6 +2,7 @@ package com.luiszapata.gestaoeventosapi.service;
 
 import com.luiszapata.gestaoeventosapi.dto.ParticipanteRequestDTO;
 import com.luiszapata.gestaoeventosapi.dto.ParticipanteResponseDTO;
+import com.luiszapata.gestaoeventosapi.exception.RecursoNaoEncontradoException;
 import com.luiszapata.gestaoeventosapi.model.Participante;
 import com.luiszapata.gestaoeventosapi.repository.ParticipanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class ParticipanteService{
         if (participanteOptional.isPresent()){
             return participanteOptional.get();
         } else {
-            throw new RuntimeException("Participante não encontrado com id: " + id);
+            throw new RecursoNaoEncontradoException("Participante não encontrado com id: " + id);
         }
 
     }

@@ -4,6 +4,8 @@ import com.luiszapata.gestaoeventosapi.dto.EventoResponseDTO;
 import com.luiszapata.gestaoeventosapi.dto.InscricaoRequestDTO;
 import com.luiszapata.gestaoeventosapi.dto.InscricaoResponseDTO;
 import com.luiszapata.gestaoeventosapi.dto.ParticipanteResponseDTO;
+import com.luiszapata.gestaoeventosapi.exception.RecursoNaoEncontradoException;
+import com.luiszapata.gestaoeventosapi.exception.VagasEsgotadasException;
 import com.luiszapata.gestaoeventosapi.model.Evento;
 import com.luiszapata.gestaoeventosapi.model.Inscricao;
 import com.luiszapata.gestaoeventosapi.model.Participante;
@@ -36,7 +38,7 @@ public class InscricaoService{
         int vagasOcupadas = inscricoesDoEvento.size();
 
         if (vagasOcupadas >= evento.getVagasTotais()){
-            throw new RuntimeException("Não há vagas disponíveis para este evento");
+            throw new VagasEsgotadasException("Não há vagas disponíveis para este evento");
 
         }
 
@@ -98,7 +100,7 @@ public class InscricaoService{
         if (inscricaoOptional.isPresent()){
             return inscricaoOptional.get();
         } else {
-            throw new RuntimeException("Inscrição não encontrada com id: " + id);
+            throw new RecursoNaoEncontradoException("Inscrição não encontrada com id: " + id);
         }
     }
 
