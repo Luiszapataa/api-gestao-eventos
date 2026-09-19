@@ -216,6 +216,7 @@
     </div>
 </div>
 
+
 <script>
     function mostrarAba(nome){
 
@@ -224,6 +225,7 @@
 
         document.getElementById(nome).classList.add('active');
         event.target.classList.add('active');
+
 
     }
 
@@ -235,6 +237,7 @@
             const mensagem = erro && erro.mensagem ? erro.mensagem : 'Ocorreu um erro inesperado.';
             mostrarErro(mensagem);
             throw new Error(mensagem);
+
         }
 
         esconderErro();
@@ -244,16 +247,19 @@
         }
 
         return resposta.json();
+
     }
 
     function mostrarErro(mensagem){
         const div = document.getElementById('mensagemErro');
         div.textContent = mensagem;
         div.style.display = 'block';
+
     }
 
     function esconderErro(){
         document.getElementById('mensagemErro').style.display = 'none';
+
     }
 
 
@@ -283,12 +289,15 @@
             opcao.textContent = evento.nome;
             selectEvento.appendChild(opcao);
         });
+
     }
+
 
     async function excluirEvento(id){
         await chamarApi('/eventos/' + id, { method: 'DELETE' });
         carregarEventos();
     }
+
 
     document.getElementById('formEvento').addEventListener('submit', async function(evento){
         evento.preventDefault();
@@ -300,6 +309,8 @@
             local: document.getElementById('eventoLocal').value,
             vagasTotais: parseInt(document.getElementById('eventoVagas').value)
         };
+
+
 
         try{
             await chamarApi('/eventos', {
@@ -313,6 +324,7 @@
         } catch (e){
         }
     });
+
 
 
     async function carregarParticipantes(){
@@ -338,12 +350,14 @@
             opcao.value = participante.id;
             opcao.textContent = participante.nome;
             selectParticipante.appendChild(opcao);
+
         });
     }
 
     async function excluirParticipante(id){
         await chamarApi('/participantes/' + id, { method: 'DELETE' });
         carregarParticipantes();
+
     }
 
     document.getElementById('formParticipante').addEventListener('submit', async function(evento){
@@ -352,7 +366,9 @@
         const corpo = {
             nome: document.getElementById('participanteNome').value,
             email: document.getElementById('participanteEmail').value
+
         };
+
 
         try{
             await chamarApi('/participantes', {
@@ -365,7 +381,9 @@
             carregarParticipantes();
         } catch (e){
         }
+
     });
+
 
 
     async function carregarInscricoes(){
@@ -385,13 +403,16 @@
             `;
             corpo.appendChild(linha);
         });
+
     }
+
 
     async function excluirInscricao(id){
         await chamarApi('/inscricoes/' + id, { method: 'DELETE' });
         carregarInscricoes();
         carregarEventos();
     }
+
 
     document.getElementById('formInscricao').addEventListener('submit', async function(evento){
         evento.preventDefault();
@@ -400,6 +421,7 @@
             eventoId: parseInt(document.getElementById('inscricaoEvento').value),
             participanteId: parseInt(document.getElementById('inscricaoParticipante').value)
         };
+
 
         try{
             await chamarApi('/inscricoes', {
@@ -413,6 +435,9 @@
             carregarEventos();
         } catch (e){
         }
+
+
+
     });
 
 

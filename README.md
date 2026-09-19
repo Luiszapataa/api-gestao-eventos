@@ -41,7 +41,7 @@ Evento (1) ────── (N) Inscricao (N) ────── (1) Participa
 
 ## Regras de negócio
 
-- Inscrição bloqueada se o evento já atingiu o limite de vagas
+- Inscrição bloqueada se o evento já atingu o limite de vagas
 - E-mail de participante não pode se repetir
 - Data da inscrição é preenchida automaticamente
 
@@ -107,7 +107,7 @@ git clone https://github.com/Luiszapataa/api-gestao-eventos.git
 CREATE DATABASE gestao_eventos;
 ```
 
-3. Configure a variável de ambiente `DB_PASSWORD` com a senha do seu PostgreSQL.
+3. Configure a variável de ambient `DB_PASSWORD` com a senha do seu PostgreSQL.
 
 4. Rode a aplicação:
 ```bash

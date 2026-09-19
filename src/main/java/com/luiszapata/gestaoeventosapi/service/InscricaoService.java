@@ -126,6 +126,7 @@ public class InscricaoService{
                 eventoDTO,
                 participanteDTO
         );
+
     }
 
 }
