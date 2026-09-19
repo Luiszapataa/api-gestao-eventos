@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Eventos e Inscrições</title>
+
+    <style>
+        *{
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body{
+            background: #f2f4f7;
+            margin: 0;
+            padding: 20px;
+            color: #222;
+        }
+
+        h1{
+            text-align: center;
+            color: #1a3c5e;
+        }
+
+        .container{
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .tabs{
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tab-button{
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #d9e2ec;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab-button.active{
+            background: #1a3c5e;
+            color: white;
+        }
+
+        .tab-content{
+            display: none;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active{
+            display: block;
+        }
+
+        form{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        input, select, textarea{
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        button{
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #1a3c5e;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover{
+            background: #142f4a;
+        }
+
+        table{
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td{
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th{
+            background: #f2f4f7;
+        }
+
+        .btn-excluir{
+            background: #c0392b;
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .btn-excluir:hover{
+            background: #96281b;
+        }
+
+        .mensagem-erro{
+            background: #fdecea;
+            color: #c0392b;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Gestão de Eventos e Inscrições</h1>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="mostrarAba('eventos')">Eventos</button>
+        <button class="tab-button" onclick="mostrarAba('participantes')">Participantes</button>
+        <button class="tab-button" onclick="mostrarAba('inscricoes')">Inscrições</button>
+    </div>
+
+    <div id="mensagemErro" class="mensagem-erro"></div>
+
+    <div id="eventos" class="tab-content active">
+        <h2>Novo Evento</h2>
+        <form id="formEvento">
+            <input type="text" id="eventoNome" placeholder="Nome do evento" required>
+            <input type="text" id="eventoDescricao" placeholder="Descrição">
+            <input type="datetime-local" id="eventoData" required>
+            <input type="text" id="eventoLocal" placeholder="Local" required>
+            <input type="number" id="eventoVagas" placeholder="Vagas totais" min="1" required>
+            <button type="submit">Criar Evento</button>
+        </form>
+
+        <h2>Eventos Cadastrados</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Data</th>
+                <th>Local</th>
+                <th>Vagas</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="listaEventos"></tbody>
+        </table>
+    </div>
+
+    <div id="participantes" class="tab-content">
+        <h2>Novo Participante</h2>
+        <form id="formParticipante">
+            <input type="text" id="participanteNome" placeholder="Nome" required>
+            <input type="email" id="participanteEmail" placeholder="E-mail" required>
+            <button type="submit">Criar Participante</button>
+        </form>
+
+        <h2>Participantes Cadastrados</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="listaParticipantes"></tbody>
+        </table>
+    </div>
+
+    <div id="inscricoes" class="tab-content">
+        <h2>Nova Inscrição</h2>
+        <form id="formInscricao">
+            <select id="inscricaoEvento" required>
+                <option value="">Selecione o evento</option>
+            </select>
+            <select id="inscricaoParticipante" required>
+                <option value="">Selecione o participante</option>
+            </select>
+            <button type="submit">Inscrever</button>
+        </form>
+
+        <h2>Inscrições Realizadas</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Evento</th>
+                <th>Participante</th>
+                <th>Data da Inscrição</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="listaInscricoes"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function mostrarAba(nome){
+
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(nome).classList.add('active');
+        event.target.classList.add('active');
+
+    }
+
+    async function chamarApi(url, opcoes){
+        const resposta = await fetch(url, opcoes);
+
+        if (!resposta.ok){
+            const erro = await resposta.json().catch(() => null);
+            const mensagem = erro && erro.mensagem ? erro.mensagem : 'Ocorreu um erro inesperado.';
+            mostrarErro(mensagem);
+            throw new Error(mensagem);
+        }
+
+        esconderErro();
+
+        if (resposta.status === 204){
+            return null;
+        }
+
+        return resposta.json();
+    }
+
+    function mostrarErro(mensagem){
+        const div = document.getElementById('mensagemErro');
+        div.textContent = mensagem;
+        div.style.display = 'block';
+    }
+
+    function esconderErro(){
+        document.getElementById('mensagemErro').style.display = 'none';
+    }
+
+
+    async function carregarEventos(){
+        const eventos = await chamarApi('/eventos', { method: 'GET' });
+
+        const corpo = document.getElementById('listaEventos');
+        corpo.innerHTML = '';
+
+        const selectEvento = document.getElementById('inscricaoEvento');
+        selectEvento.innerHTML = '<option value="">Selecione o evento</option>';
+
+        eventos.forEach(evento => {
+            const linha = document.createElement('tr');
+            linha.innerHTML = `
+                <td>${evento.id}</td>
+                <td>${evento.nome}</td>
+                <td>${new Date(evento.dataEvento).toLocaleString('pt-BR')}</td>
+                <td>${evento.local}</td>
+                <td>${evento.vagasTotais}</td>
+                <td><button class="btn-excluir" onclick="excluirEvento(${evento.id})">Excluir</button></td>
+            `;
+            corpo.appendChild(linha);
+
+            const opcao = document.createElement('option');
+            opcao.value = evento.id;
+            opcao.textContent = evento.nome;
+            selectEvento.appendChild(opcao);
+        });
+    }
+
+    async function excluirEvento(id){
+        await chamarApi('/eventos/' + id, { method: 'DELETE' });
+        carregarEventos();
+    }
+
+    document.getElementById('formEvento').addEventListener('submit', async function(evento){
+        evento.preventDefault();
+
+        const corpo = {
+            nome: document.getElementById('eventoNome').value,
+            descricao: document.getElementById('eventoDescricao').value,
+            dataEvento: document.getElementById('eventoData').value,
+            local: document.getElementById('eventoLocal').value,
+            vagasTotais: parseInt(document.getElementById('eventoVagas').value)
+        };
+
+        try{
+            await chamarApi('/eventos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(corpo)
+            });
+
+            evento.target.reset();
+            carregarEventos();
+        } catch (e){
+        }
+    });
+
+
+    async function carregarParticipantes(){
+        const participantes = await chamarApi('/participantes', { method: 'GET' });
+
+        const corpo = document.getElementById('listaParticipantes');
+        corpo.innerHTML = '';
+
+        const selectParticipante = document.getElementById('inscricaoParticipante');
+        selectParticipante.innerHTML = '<option value="">Selecione o participante</option>';
+
+        participantes.forEach(participante => {
+            const linha = document.createElement('tr');
+            linha.innerHTML = `
+                <td>${participante.id}</td>
+                <td>${participante.nome}</td>
+                <td>${participante.email}</td>
+                <td><button class="btn-excluir" onclick="excluirParticipante(${participante.id})">Excluir</button></td>
+            `;
+            corpo.appendChild(linha);
+
+            const opcao = document.createElement('option');
+            opcao.value = participante.id;
+            opcao.textContent = participante.nome;
+            selectParticipante.appendChild(opcao);
+        });
+    }
+
+    async function excluirParticipante(id){
+        await chamarApi('/participantes/' + id, { method: 'DELETE' });
+        carregarParticipantes();
+    }
+
+    document.getElementById('formParticipante').addEventListener('submit', async function(evento){
+        evento.preventDefault();
+
+        const corpo = {
+            nome: document.getElementById('participanteNome').value,
+            email: document.getElementById('participanteEmail').value
+        };
+
+        try{
+            await chamarApi('/participantes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(corpo)
+            });
+
+            evento.target.reset();
+            carregarParticipantes();
+        } catch (e){
+        }
+    });
+
+
+    async function carregarInscricoes(){
+        const inscricoes = await chamarApi('/inscricoes', { method: 'GET' });
+
+        const corpo = document.getElementById('listaInscricoes');
+        corpo.innerHTML = '';
+
+        inscricoes.forEach(inscricao => {
+            const linha = document.createElement('tr');
+            linha.innerHTML = `
+                <td>${inscricao.id}</td>
+                <td>${inscricao.evento.nome}</td>
+                <td>${inscricao.participante.nome}</td>
+                <td>${new Date(inscricao.dataInscricao).toLocaleString('pt-BR')}</td>
+                <td><button class="btn-excluir" onclick="excluirInscricao(${inscricao.id})">Excluir</button></td>
+            `;
+            corpo.appendChild(linha);
+        });
+    }
+
+    async function excluirInscricao(id){
+        await chamarApi('/inscricoes/' + id, { method: 'DELETE' });
+        carregarInscricoes();
+        carregarEventos();
+    }
+
+    document.getElementById('formInscricao').addEventListener('submit', async function(evento){
+        evento.preventDefault();
+
+        const corpo = {
+            eventoId: parseInt(document.getElementById('inscricaoEvento').value),
+            participanteId: parseInt(document.getElementById('inscricaoParticipante').value)
+        };
+
+        try{
+            await chamarApi('/inscricoes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(corpo)
+            });
+
+            evento.target.reset();
+            carregarInscricoes();
+            carregarEventos();
+        } catch (e){
+        }
+    });
+
+
+    carregarEventos();
+    carregarParticipantes();
+    carregarInscricoes();
+</script>
+
+
+</body>
+
+
+
+</html>

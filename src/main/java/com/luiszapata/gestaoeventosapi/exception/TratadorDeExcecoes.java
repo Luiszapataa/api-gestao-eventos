@@ -37,6 +37,16 @@ public class TratadorDeExcecoes{
 
     }
 
+    @ExceptionHandler(EmailJaCadastradoException.class)
+    public ResponseEntity<MensagemErroDTO> tratarEmailJaCadastrado(EmailJaCadastradoException ex){
+        MensagemErroDTO erro = new MensagemErroDTO(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage()
+        );
+
+        return new ResponseEntity<>(erro, HttpStatus.BAD_REQUEST);
+    }
 
 
 }
